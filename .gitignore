@@ -1,0 +1,37 @@
+# Virtual environment
+venv/
+
+# IDE (e.g., PyCharm) configuration
+.idea/
+
+# Compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Static files (usually collected during deployment)
+staticfiles/
+
+# Media files (user-uploaded content)
+media/
+
+# Configuration files that may contain sensitive information
+*.env
+
+# Dependency directories
+env/
+lib/
+lib64/
+bin/
+include/
+
+# Log files
+*.log
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Windows system files
+Thumbs.db
+
