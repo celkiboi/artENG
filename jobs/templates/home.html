@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
     
-{% if request.user.is_authenticated%}
-Prijavljen: {{request.user.username}}
-<a>Odjava</a>
-{% else %}
-<a>Prijava</a>
-{% endif %}  
-
+    {% if request.user.is_authenticated%}
+        Logged in: {{request.user.username}}
+        <a href="{% url 'jobs:logout' %}">Logout</a>
+    {% else %}
+        <a href="{% url 'jobs:login' %}">Login</a>
+    {% endif %}  
 
 {% endblock content %}
