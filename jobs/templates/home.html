@@ -2,7 +2,7 @@
 {% block content %}
     
     {% if request.user.is_authenticated%}
-        Logged in: {{request.user.username}}
+        Logged in: {{request.user.user_name}}
         <a href="{% url 'jobs:logout' %}">Logout</a>
     {% else %}
         <a href="{% url 'jobs:login' %}">Login</a>
