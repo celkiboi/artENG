@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <title></title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-    </head>
-    <body>
-        <p>Hello</p>
-    </body>
-</html>
+{% extends 'base.html' %}
+{% block content %}
+    
+{% if request.user.is_authenticated%}
+Prijavljen: {{request.user.username}}
+<a>Odjava</a>
+{% else %}
+<a>Prijava</a>
+{% endif %}  
+
+
+{% endblock content %}
