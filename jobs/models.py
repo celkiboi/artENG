@@ -60,7 +60,7 @@ class Student(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Students'
     
     def get_full_name(self):
-        return self.user_name
+        return f"{self.first_name} {self.last_name}"
     
     def get_short_name(self):
         return self.user_name
@@ -68,3 +68,24 @@ class Student(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.get_student_type_display()})"
 
+class Job(models.Model):
+    job_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    JOB_TYPES = [
+        ('engineering', 'Engineering Job'),
+        ('art', 'Art Job'),
+    ]
+    job_type = models.CharField(max_length=20, choices=JOB_TYPES)
+    poster = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='posted_jobs')
+    assign_deadline = models.DateTimeField()
+    completion_deadline = models.DateTimeField()
+    assigned_to = models.ForeignKey(Student, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_jobs')
+    compensation = models.DecimalField(max_digits=10, decimal_places=2)
+    is_completed = models.BooleanField(default=False)
+    is_under_dispute = models.BooleanField(default=False)
+    eng_approved = models.BooleanField(default=False)
+    art_approved = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.name

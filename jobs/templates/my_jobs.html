@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  {% if user.is_authenticated %}
+    <h2>Your Jobs:</h2>
+    <h3>Jobs you posted: </h3>
+    {% for job in posted_jobs %}
+      <div>
+        <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+        <p>Compensation: {{ job.compensation }} €</p>
+        <p>Applications until: {{ job.assign_deadline }}</p>
+        <p>Has to be completed until: {{ job.completion_deadline }}</p>
+      </div>
+    {% endfor %}
+    <h3>Jobs you are assigned to: </h3>
+    {% for job in assigned_jobs %}
+      <div>
+        <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+        <p>Compensation: {{ job.compensation }} €</p>
+        <p>Applications until: {{ job.assign_deadline }}</p>
+        <p>Has to be completed until: {{ job.completion_deadline }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <h2>You are not logged in</h2>
+  {% endif %}
+{% endblock %}

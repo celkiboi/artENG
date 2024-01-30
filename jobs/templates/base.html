@@ -17,11 +17,13 @@
 
         <ul>
             <li>
-                <a href="">Jobs</a>
+                <a href="{% url 'jobs:jobs' %}">Jobs</a>
             </li>
+            {% if user.is_authenticated %}
             <li>
-                <a href="">Post a Job</a>
+                <a href="{% url 'jobs:create_job' %}">Post a Job</a>
             </li>
+            {% endif %}
         </ul>
 
         <ul>
@@ -33,7 +35,7 @@
                     <a href="{% url 'jobs:logout' %}">Logout</a>
                 </li>
                 <li>
-                    <a href="">My Jobs</a>
+                    <a href="{% url 'jobs:my_jobs' %}">My Jobs</a>
                 </li>
             {% else %}
                 <li>
