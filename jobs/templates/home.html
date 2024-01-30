@@ -1,11 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
     
-    {% if request.user.is_authenticated%}
-        Logged in: {{request.user.user_name}}
-        <a href="{% url 'jobs:logout' %}">Logout</a>
-    {% else %}
-        <a href="{% url 'jobs:login' %}">Login</a>
-    {% endif %}  
+<h1>Welcome to artENG</h1>
 
 {% endblock content %}

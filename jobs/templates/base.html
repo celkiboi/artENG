@@ -1,15 +1,52 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title></title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>artENG</title>
-    </head>
-    <body>
-        <p>????</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Your Web Application{% endblock %}</title>
+    <!-- You can link your own stylesheet here if needed -->
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
 
-        {% block content %}
-        {% endblock content %}
-    </body>
+<nav>
+    <div>
+        <a href="">Your Logo</a>
+
+        <ul>
+            <li>
+                <a href="">Jobs</a>
+            </li>
+            <li>
+                <a href="">Post a Job</a>
+            </li>
+        </ul>
+
+        <ul>
+            {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'jobs:profile' student.user_name %}">Profile</a>
+                </li>
+                <li>
+                    <a href="{% url 'jobs:logout' %}">Logout</a>
+                </li>
+                <li>
+                    <a href="">My Jobs</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{% url 'jobs:login' %}">Login</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
+
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
 </html>
