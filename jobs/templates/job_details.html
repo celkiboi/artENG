@@ -19,12 +19,15 @@
                 This job has been completed by:
                 <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
             </h3>
+            <p>View the completed job <a href="{{job.finished_link}}">here</a></p>
             {% else %}
                 <h3>
                     This job has been assigned to 
                     <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
                 </h3>
                 {% if job.assigned_to == student %}
+                    <label for="jobFinishedLink">Enter Finished Job Link:</label>
+                    <input type="text" id="jobFinishedLink" name="jobFinishedLink" required>
                     <button id="finishButton" >Mark job as completed</button>
                 {% endif %}
             {% endif %}
@@ -96,13 +99,19 @@
 </script>
 <script>
     document.getElementById("finishButton").addEventListener("click", function() {
+        const jobFinishedLink = document.getElementById("jobFinishedLink").value;
+        if (jobFinishedLink.trim() === "") {
+            alert("Please enter a finished job link.");
+            return;
+        }
         fetch("{% url 'jobs:mark_job_completed' job.job_id %}", {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',  // Use form data
             },
+            body: new URLSearchParams({ jobFinishedLink: jobFinishedLink }),  // Convert data to URLSearchParams
         })
         .then(() => {
             location.reload();

@@ -36,7 +36,8 @@ class Student(AbstractBaseUser, PermissionsMixin):
     )
     email = models.EmailField(unique=True)
     user_name = models.CharField(max_length=20, unique=True)
-    
+    balance = models.IntegerField(default=1000)
+
     USERNAME_FIELD = 'user_name'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email']
@@ -83,6 +84,7 @@ class Job(models.Model):
     assigned_to = models.ForeignKey(Student, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_jobs')
     compensation = models.DecimalField(max_digits=10, decimal_places=2)
     is_completed = models.BooleanField(default=False)
+    finished_link = models.TextField(default="")
     is_under_dispute = models.BooleanField(default=False)
     eng_approved = models.BooleanField(default=False)
     art_approved = models.BooleanField(default=False)

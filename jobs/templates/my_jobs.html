@@ -2,9 +2,9 @@
 
 {% block content %}
   {% if user.is_authenticated %}
-    <h2>Your Jobs:</h2>
+    <h2>Your active jobs:</h2>
     <h3>Jobs you posted: </h3>
-    {% for job in posted_jobs %}
+    {% for job in posted_jobs_active %}
       <div>
         <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
         <p>Compensation: {{ job.compensation }} €</p>
@@ -13,7 +13,26 @@
       </div>
     {% endfor %}
     <h3>Jobs you are assigned to: </h3>
-    {% for job in assigned_jobs %}
+    {% for job in assigned_jobs_active %}
+      <div>
+        <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+        <p>Compensation: {{ job.compensation }} €</p>
+        <p>Applications until: {{ job.assign_deadline }}</p>
+        <p>Has to be completed until: {{ job.completion_deadline }}</p>
+      </div>
+    {% endfor %}
+    <h2>Your previous jobs:</h2>
+      <h3>Jobs you posted: </h3>
+      {% for job in posted_jobs_previous %}
+        <div>
+          <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+          <p>Compensation: {{ job.compensation }} €</p>
+          <p>Applications until: {{ job.assign_deadline }}</p>
+          <p>Has to be completed until: {{ job.completion_deadline }}</p>
+        </div>
+    {% endfor %}
+    <h3>Jobs you are assigned to: </h3>
+    {% for job in assigned_jobs_previous %}
       <div>
         <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
         <p>Compensation: {{ job.compensation }} €</p>

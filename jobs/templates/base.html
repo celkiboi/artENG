@@ -37,6 +37,9 @@
                 <li>
                     <a href="{% url 'jobs:my_jobs' %}">My Jobs</a>
                 </li>
+                <li>
+                    <p>Balance: {{user.balance}}€</p>
+                </li>
             {% else %}
                 <li>
                     <a href="{% url 'jobs:login' %}">Login</a>

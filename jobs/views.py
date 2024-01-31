@@ -7,6 +7,7 @@ from .models import Student, Job, JobApplication
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+from django.contrib import messages
 
 class CustomLoginView(LoginView):
     form_class = LoginForm
@@ -94,8 +95,13 @@ def create_job(request):
                 job.job_type = 'art'
             else:
                 job.job_type = 'engineering'
-            job.save()
-            return redirect('jobs:jobs')  
+            if request.user.balance >= job.compensation:
+                request.user.balance = request.user.balance -  job.compensation
+                request.user.save()
+                job.save()
+                return redirect('jobs:jobs')
+            else:
+                messages.error(request, 'Insufficient funds to post the job.')
     else:
         form = JobForm()
     
@@ -104,12 +110,16 @@ def create_job(request):
 @login_required
 def my_jobs(request):
     student = request.user
-    assigned_jobs = Job.objects.filter(assigned_to=student)
-    posted_jobs = Job.objects.filter(poster=student)
+    assigned_jobs_active = Job.objects.filter(assigned_to=student, is_completed=False)
+    posted_jobs_active = Job.objects.filter(poster=student, is_completed=False)
+    assigned_jobs_previous = Job.objects.filter(assigned_to=student, is_completed=True)
+    posted_jobs_previous = Job.objects.filter(poster=student, is_completed=True)
     context = {
         'student': student, 
-        'assigned_jobs': assigned_jobs,
-        'posted_jobs': posted_jobs
+        'assigned_jobs_active': assigned_jobs_active,
+        'posted_jobs_active': posted_jobs_active,
+        'posted_jobs_previous': posted_jobs_previous,
+        'assigned_jobs_previous': assigned_jobs_previous
         }
     return render(request, 'my_jobs.html', context)
 
@@ -124,10 +134,16 @@ def apply_for_job(request, job_id):
         response_data = {'success': False, 'message': 'You cannot apply for this job.'}
     return JsonResponse(response_data)
 
+
 def mark_job_completed(request, job_id):
     job = get_object_or_404(Job, pk=job_id)
+    if(job.is_completed is False):
+        request.user.balance += job.compensation
+    finished_link = request.POST.get("jobFinishedLink", 'no link provided').strip()
+    job.finished_link = finished_link
     job.is_completed = True
     job.save()
+    request.user.save()
     return redirect('jobs:job_detail', job_id=job_id)
 
 @require_POST
