@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import Student, Job
+from .models import Student, Job, JobApplication
 
 class StudentAdmin(admin.ModelAdmin):
     TYPE_CHOICES = (
@@ -24,3 +24,10 @@ class JobAdmin(admin.ModelAdmin):
     list_display = ('job_id', 'name', 'job_type', 'poster', 'assign_deadline', 'completion_deadline', 'assigned_to', 'compensation')
     search_fields = ('name', 'description', 'poster__user_name', 'assigned_to__user_name')
     list_filter = ('job_type', 'assign_deadline', 'completion_deadline', 'assigned_to')
+
+@admin.register(JobApplication)
+class JobApplicationAdmin(admin.ModelAdmin):
+    list_display = ('job', 'applicant', 'applied_at', 'is_accepted')
+    list_filter = ('is_accepted',)
+    search_fields = ('job__name', 'applicant__user_name', 'applicant__first_name', 'applicant__last_name')
+    date_hierarchy = 'applied_at'

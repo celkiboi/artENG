@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import homepage, logout_view, profile, job_detail, jobs, create_job, my_jobs
+from .views import homepage, logout_view, profile, job_detail, jobs, create_job, my_jobs, apply_for_job, mark_job_completed, accept_job_application
 from .views import CustomLoginView, register
 
 app_name = "jobs"
@@ -12,5 +12,8 @@ urlpatterns = [
     path('jobs/<int:job_id>', job_detail, name='job_detail'),
     path('jobs/', jobs, name="jobs"),
     path('jobs/create', create_job, name='create_job'),
-    path('jobs/my', my_jobs, name='my_jobs')
+    path('jobs/my', my_jobs, name='my_jobs'),
+    path('jobs/<int:job_id>/apply/', apply_for_job, name='apply_for_job'),
+    path('jobs/<int:job_id>/mark_completed/', mark_job_completed, name='mark_job_completed'),
+    path('jobs/applications/<int:application_id>/accept/', accept_job_application, name='accept_job_application'),
 ]

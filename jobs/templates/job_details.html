@@ -6,28 +6,133 @@
     {% if job.assigned_to == student or job.poster == student %}
         <h3>Job info:</h3>
         <p>Job name: {{job.name}}</p>
-        <p>Poster: {{poster.get_full_name}}</p>
+        <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
         <p>Job type: {{job.job_type}}</p>
         <p>Compesation: {{job.compensation}} €</p>
         <h3>Deadlines:</h3>
-        <p>Applications until: {{job.assign_deadline}}</p>
         <p>Has to be completed until: {{job.completion_deadline}}</p>
         <h3>Description:</h3>
         <p>{{job.description}}</p>
+        {% if job.assigned_to is not None %}
+            {% if job.is_completed %}
+            <h3>
+                This job has been completed by:
+                <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
+            </h3>
+            {% else %}
+                <h3>
+                    This job has been assigned to 
+                    <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
+                </h3>
+                {% if job.assigned_to == student %}
+                    <button id="finishButton" >Mark job as completed</button>
+                {% endif %}
+            {% endif %}
+        {% elif number_of_applications == 0 %}
+            <h3>There are no applications, yet.</h3>
+        {% else %}
+            <h3>Applications: </h3>
+            {% for application in applications %}
+                <div>
+                    <p>Applicant: <a href="{% url 'jobs:profile' application.applicant.user_name %}">{{ application.applicant.get_full_name }}</a></p>
+                    <p>Applied at: {{ application.applied_at }}</p>
+                    <button id="acceptApplicationButton" data-application-id="{{ application.application_id }}">Accept</button>
+                </div>
+            {% endfor %}
+        {% endif %}
     {% elif job.assigned_to is not None %}
         <h2>Sorry this job is taken!</h2>
     {% else %}
         <h2>This job is still avalible</h2>
         <h3>Job info:</h3>
         <p>Job name: {{job.name}}</p>
-        <p>Poster: {{poster.get_full_name}}</p>
+        <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
         <p>Job type: {{job.job_type}}</p>
         <p>Compesation: {{job.compensation}} €</p>
+        <p>Number of applications: {{ number_of_applications }}</p>
         <h3>Deadlines:</h3>
         <p>Applications until: {{job.assign_deadline}}</p>
         <p>Has to be completed until: {{job.completion_deadline}}</p>
         <h3>Description:</h3>
         <p>{{job.description}}</p>
+        {% if user_has_applied %}
+            <h3>You already applied for this job</h3>
+        {% else %}
+            {% if can_apply %}
+                <button id="applyButton">Apply for the job!</button>
+            {% else %}
+                <h3>You cannot apply for this job</h3>
+            {% endif %}
+        {% endif %}
     {% endif %}
 {% endif %}
+
+<script>
+    document.getElementById("applyButton").addEventListener("click", function() {
+        document.getElementById("applyButton").style.display = 'none';
+
+        fetch("{% url 'jobs:apply_for_job' job.job_id %}", {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("success_application").style.display = 'block';
+                document.getElementById("success_application_text").innerHTML = data.message;
+            } else {
+                document.getElementById("failure_application").style.display = 'block';
+                document.getElementById("failure_application_text").innerHTML = data.message;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+<script>
+    document.getElementById("finishButton").addEventListener("click", function() {
+        fetch("{% url 'jobs:mark_job_completed' job.job_id %}", {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+<script>
+    document.getElementById("acceptApplicationButton").addEventListener("click", function() {
+        const applicationId = this.dataset.applicationId;
+        fetch(`{% url 'jobs:accept_job_application' application_id=0 %}`.replace('0', applicationId), {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+
+<div id="success_application" style="display: none;"><h2 id="success_application_text"></h2></div>
+<div id="failure_application" style="display: none;"><h2 id="failure_application_text"_text></h2></div>
+
 {% endblock %}

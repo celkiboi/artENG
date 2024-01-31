@@ -89,3 +89,13 @@ class Job(models.Model):
     
     def __str__(self):
         return self.name
+
+class JobApplication(models.Model):
+    application_id = models.AutoField(primary_key=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    applicant = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='job_applications')
+    applied_at = models.DateTimeField(default=timezone.now)
+    is_accepted = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Application for {self.job.name} by {self.applicant.get_full_name()}"

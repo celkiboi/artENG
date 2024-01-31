@@ -3,8 +3,10 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, get_object_or_404
 from .forms import LoginForm, RegistrationForm, JobForm
 from django.shortcuts import render, redirect
-from .models import Student, Job
+from .models import Student, Job, JobApplication
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
 class CustomLoginView(LoginView):
     form_class = LoginForm
@@ -44,18 +46,32 @@ def register(request):
 
 def profile(request, username):
     student = get_object_or_404(Student, user_name=username)
+    completed_jobs = Job.objects.filter(assigned_to=student, is_completed=True).count
     context = {
-        'student': student 
+        'student': student,
+        'completed_jobs': completed_jobs
     }
     return render(request, 'profile.html', context)
 
 def job_detail(request, job_id):
     job = get_object_or_404(Job, pk=job_id)
+    student = request.user
     poster = job.poster
+    can_apply = False
+    user_has_applied = False
+    applications = JobApplication.objects.filter(job = job)
+    number_of_applications = applications.count
+    if not request.user.is_anonymous:
+        can_apply = not user_has_applied and student != poster and job.job_type == student.student_type
+        user_has_applied = JobApplication.objects.filter(job = job, applicant=student).exists()
     context = {
         'job' : job,
-        'student' : request.user,
-        'poster' : poster
+        'student' : student,
+        'poster' : poster,
+        'can_apply' : can_apply,
+        'number_of_applications': number_of_applications,
+        'user_has_applied' : user_has_applied,
+        'applications' : applications
     }
     return render(request, 'job_details.html', context)
 
@@ -96,3 +112,28 @@ def my_jobs(request):
         'posted_jobs': posted_jobs
         }
     return render(request, 'my_jobs.html', context)
+
+@require_POST
+def apply_for_job(request, job_id):
+    job = get_object_or_404(Job, pk=job_id)
+    student = request.user
+    if student != job.poster and not JobApplication.objects.filter(job=job, applicant=student).exists():
+        application = JobApplication.objects.create(job=job, applicant=student)
+        response_data = {'success': True, 'message': 'Application submitted successfully!'}
+    else:
+        response_data = {'success': False, 'message': 'You cannot apply for this job.'}
+    return JsonResponse(response_data)
+
+def mark_job_completed(request, job_id):
+    job = get_object_or_404(Job, pk=job_id)
+    job.is_completed = True
+    job.save()
+    return redirect('jobs:job_detail', job_id=job_id)
+
+@require_POST
+def accept_job_application(request, application_id):
+    application = get_object_or_404(JobApplication, pk=application_id)
+    job = application.job
+    job.assigned_to = application.applicant
+    job.save()
+    return redirect('jobs:job_detail', job_id=job.job_id)
