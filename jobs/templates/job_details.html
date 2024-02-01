@@ -3,7 +3,7 @@
 {% if request.user.is_anonymous %}
     <h2>You need to be logged in to view jobs</h2>
 {% else %}
-    {% if job.assigned_to == student or job.poster == student or student.is_staff %}
+    {% if job.assigned_to == student or job.poster == student or student.is_staff and job.assigned_to is not None %}
         <h3>Job info:</h3>
         <p>Job name: {{job.name}}</p>
         <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
@@ -62,7 +62,7 @@
             {% endif %}
         {% elif number_of_applications == 0 %}
             <h3>There are no applications, yet.</h3>
-        {% else %}
+        {% elif job.poster == student %}
             <h3>Applications: </h3>
             {% for application in applications %}
                 <div>

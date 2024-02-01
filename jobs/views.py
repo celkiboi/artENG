@@ -156,6 +156,9 @@ def accept_job_application(request, application_id):
     job = application.job
     job.assigned_to = application.applicant
     job.save()
+    applications = JobApplication.objects.filter(job=job)
+    for application in applications.iterator:
+        application.delete()
     return redirect('jobs:job_detail', job_id=job.job_id)
 
 @require_POST
