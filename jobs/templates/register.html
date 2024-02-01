@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .login-container form p {
+    color: #000000; 
+}
+</style>
+
+<div class="login-container">
 
 <h2>Register</h2>
 <form method="post" action="{% url 'jobs:register' %}">
@@ -8,5 +15,7 @@
     {{ form.as_p }}
     <button type="submit">Register</button>
 </form>
+
+</div>
 
 {% endblock %}

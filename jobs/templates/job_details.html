@@ -1,104 +1,111 @@
 {% extends "base.html" %}
 {% block content %}
-{% if request.user.is_anonymous %}
-    <h2>You need to be logged in to view jobs</h2>
-{% else %}
-    {% if job.assigned_to == student or job.poster == student or student.is_staff and job.assigned_to is not None %}
-        <h3>Job info:</h3>
-        <p>Job name: {{job.name}}</p>
-        <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
-        <p>Job type: {{job.job_type}}</p>
-        <p>Compesation: {{job.compensation}} €</p>
-        <h3>Deadlines:</h3>
-        <p>Has to be completed until: {{job.completion_deadline}}</p>
-        <h3>Description:</h3>
-        <p>{{job.description}}</p>
-        {% if job.assigned_to is not None %}
-            {% if job.is_completed %}
-                <h3>
-                    This job has been completed by:
-                    <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
-                </h3>
-                <p>View the completed job <a href="{{job.finished_link}}">here</a></p>
-                {% if is_disputed %}
-                    <h3>This job is under dispute</h3>
-                    {% if student.is_staff %}
-                        {% if dispute.eng_approved and student.student_type == "engineering" %}
-                            <h3>You cannot edit this dispute</h3>
-                        {% elif dispute.art_approved and student.student_type == "art" %}
-                            <h3>You cannot edit this dispute</h3>
-                        {% elif dispute.art_approved and student.student_type == "engineering" %}
-                            <h3>Art staff member has sided with {{dispute.chosen_side}}</h3>
-                            <p>Do you agree with the staff member?</p>
-                            <button id="yesDispute">Yes</button>
-                            <button id="noDispute">No</button>
-                        {% elif dispute.eng_approved and student.student_type == "art" %}
-                            <h3>Engineering staff member has sided with {{dispute.chosen_side}}</h3>
-                            <p>Do you agree with the staff member?</p>
-                            <button id="yesDispute">Yes</button>
-                            <button id="noDispute">No</button>
-                        {% elif not dispute.eng_approved and not dispute_art_approved %}
-                            <button id="sidePosterButton">Side with poster</button>
-                            <button id="sideWorkerButton">Side with worker</button>
+<div class="job-detail-container">
+    {% if request.user.is_anonymous %}
+        <h2>You need to be logged in to view jobs</h2>
+    {% else %}
+        {% if job.assigned_to == student or job.poster == student or student.is_staff and job.assigned_to is not None %}
+        <div class="job-info">
+            <h3>Job info:</h3>
+            <p>Job name: {{job.name}}</p>
+            <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
+            <p>Job type: {{job.job_type}}</p>
+            <p>Compesation: {{job.compensation}} €</p>
+            <h3>Deadlines:</h3>
+            <p>Has to be completed until: {{job.completion_deadline}}</p>
+            <h3>Description:</h3>
+            <p>{{job.description}}</p>
+            {% if job.assigned_to is not None %}
+                {% if job.is_completed %}
+                    <h3>
+                        This job has been completed by:
+                        <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
+                    </h3>
+                    <p>View the completed job <a href="{{job.finished_link}}">here</a></p>
+                    {% if is_disputed %}
+                        <h3>This job is under dispute</h3>
+                        {% if student.is_staff %}
+                            {% if dispute.eng_approved and student.student_type == "engineering" %}
+                                <h3>You cannot edit this dispute</h3>
+                            {% elif dispute.art_approved and student.student_type == "art" %}
+                                <h3>You cannot edit this dispute</h3>
+                            {% elif dispute.art_approved and student.student_type == "engineering" %}
+                                <h3>Art staff member has sided with {{dispute.chosen_side}}</h3>
+                                <p>Do you agree with the staff member?</p>
+                                <button id="yesDispute">Yes</button>
+                                <button id="noDispute">No</button>
+                            {% elif dispute.eng_approved and student.student_type == "art" %}
+                                <h3>Engineering staff member has sided with {{dispute.chosen_side}}</h3>
+                                <p>Do you agree with the staff member?</p>
+                                <button id="yesDispute">Yes</button>
+                                <button id="noDispute">No</button>
+                            {% elif not dispute.eng_approved and not dispute_art_approved %}
+                                <button id="sidePosterButton">Side with poster</button>
+                                <button id="sideWorkerButton">Side with worker</button>
+                            {% endif %}
+                        {% endif %}
+                    {% elif job.poster == student %}
+                        {% if not job.was_disputed %}
+                            <button id="disputeButton">Dispute</button>
+                        {% else %}
+                            <p>The dispute for this job has already been resolved</p>
                         {% endif %}
                     {% endif %}
-                {% elif job.poster == student %}
-                    {% if not job.was_disputed %}
-                        <button id="disputeButton">Dispute</button>
-                    {% else %}
-                        <p>The dispute for this job has already been resolved</p>
+                {% else %}
+                    <h3>
+                        This job has been assigned to 
+                        <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
+                    </h3>
+                    {% if job.assigned_to == student %}
+                        <label for="jobFinishedLink">Enter Finished Job Link:</label>
+                        <input type="text" id="jobFinishedLink" name="jobFinishedLink" required>
+                        <button id="finishButton">Mark job as completed</button>
                     {% endif %}
                 {% endif %}
+            {% elif number_of_applications == 0 %}
+                <h3>There are no applications, yet.</h3>
+            {% elif job.poster == student %}
+                <h3>Applications: </h3>
+                {% for application in applications %}
+                    <div>
+                        <p>Applicant: <a href="{% url 'jobs:profile' application.applicant.user_name %}">{{ application.applicant.get_full_name }}</a></p>
+                        <p>Applied at: {{ application.applied_at }}</p>
+                        <button id="acceptApplicationButton" data-application-id="{{ application.application_id }}">Accept</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        {% elif job.assigned_to is not None %}
+            <h2>Sorry this job is taken!</h2>
+        {% else %}
+        <div class="job-info">
+            <h2>This job is still available</h2>
+            <h3>Job info:</h3>
+            <p>Job name: {{job.name}}</p>
+            <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
+            <p>Job type: {{job.job_type}}</p>
+            <p>Compesation: {{job.compensation}} €</p>
+            <p>Number of applications: {{ number_of_applications }}</p>
+            <h3>Deadlines:</h3>
+            <p>Applications until: {{job.assign_deadline}}</p>
+            <p>Has to be completed until: {{job.completion_deadline}}</p>
+            <h3>Description:</h3>
+            <p>{{job.description}}</p>
+            {% if user_has_applied %}
+                <h3>You already applied for this job</h3>
             {% else %}
-                <h3>
-                    This job has been assigned to 
-                    <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
-                </h3>
-                {% if job.assigned_to == student %}
-                    <label for="jobFinishedLink">Enter Finished Job Link:</label>
-                    <input type="text" id="jobFinishedLink" name="jobFinishedLink" required>
-                    <button id="finishButton">Mark job as completed</button>
+                {% if can_apply %}
+                    <button id="applyButton">Apply for the job!</button>
+                    <div id="success_application" style="display: none;"><h2 id="success_application_text"></h2></div>
+                    <div id="failure_application" style="display: none;"><h2 id="failure_application_text"_text></h2></div>
+                {% else %}
+                    <h3>You cannot apply for this job</h3>
                 {% endif %}
             {% endif %}
-        {% elif number_of_applications == 0 %}
-            <h3>There are no applications, yet.</h3>
-        {% elif job.poster == student %}
-            <h3>Applications: </h3>
-            {% for application in applications %}
-                <div>
-                    <p>Applicant: <a href="{% url 'jobs:profile' application.applicant.user_name %}">{{ application.applicant.get_full_name }}</a></p>
-                    <p>Applied at: {{ application.applied_at }}</p>
-                    <button id="acceptApplicationButton" data-application-id="{{ application.application_id }}">Accept</button>
-                </div>
-            {% endfor %}
         {% endif %}
-    {% elif job.assigned_to is not None %}
-        <h2>Sorry this job is taken!</h2>
-    {% else %}
-        <h2>This job is still available</h2>
-        <h3>Job info:</h3>
-        <p>Job name: {{job.name}}</p>
-        <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
-        <p>Job type: {{job.job_type}}</p>
-        <p>Compesation: {{job.compensation}} €</p>
-        <p>Number of applications: {{ number_of_applications }}</p>
-        <h3>Deadlines:</h3>
-        <p>Applications until: {{job.assign_deadline}}</p>
-        <p>Has to be completed until: {{job.completion_deadline}}</p>
-        <h3>Description:</h3>
-        <p>{{job.description}}</p>
-        {% if user_has_applied %}
-            <h3>You already applied for this job</h3>
-        {% else %}
-            {% if can_apply %}
-                <button id="applyButton">Apply for the job!</button>
-            {% else %}
-                <h3>You cannot apply for this job</h3>
-            {% endif %}
-        {% endif %}
+        </div>
     {% endif %}
-{% endif %}
-
+</div>
 
 <script>
     document.getElementById("applyButton").addEventListener("click", function() {
@@ -246,8 +253,5 @@
         });
     }
 </script>
-
-<div id="success_application" style="display: none;"><h2 id="success_application_text"></h2></div>
-<div id="failure_application" style="display: none;"><h2 id="failure_application_text"_text></h2></div>
 
 {% endblock %}

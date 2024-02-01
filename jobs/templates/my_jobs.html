@@ -2,44 +2,62 @@
 
 {% block content %}
   {% if user.is_authenticated %}
-    <h2>Your active jobs:</h2>
-    <h3>Jobs you posted: </h3>
-    {% for job in posted_jobs_active %}
-      <div>
-        <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
-        <p>Compensation: {{ job.compensation }} €</p>
-        <p>Applications until: {{ job.assign_deadline }}</p>
-        <p>Has to be completed until: {{ job.completion_deadline }}</p>
-      </div>
-    {% endfor %}
-    <h3>Jobs you are assigned to: </h3>
-    {% for job in assigned_jobs_active %}
-      <div>
-        <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
-        <p>Compensation: {{ job.compensation }} €</p>
-        <p>Applications until: {{ job.assign_deadline }}</p>
-        <p>Has to be completed until: {{ job.completion_deadline }}</p>
-      </div>
-    {% endfor %}
-    <h2>Your previous jobs:</h2>
-      <h3>Jobs you posted: </h3>
-      {% for job in posted_jobs_previous %}
-        <div>
-          <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
-          <p>Compensation: {{ job.compensation }} €</p>
-          <p>Applications until: {{ job.assign_deadline }}</p>
-          <p>Has to be completed until: {{ job.completion_deadline }}</p>
-        </div>
-    {% endfor %}
-    <h3>Jobs you are assigned to: </h3>
-    {% for job in assigned_jobs_previous %}
-      <div>
-        <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
-        <p>Compensation: {{ job.compensation }} €</p>
-        <p>Applications until: {{ job.assign_deadline }}</p>
-        <p>Has to be completed until: {{ job.completion_deadline }}</p>
-      </div>
-    {% endfor %}
+    {% if posted_jobs_active or assigned_jobs_active %}
+      <h2>Your active jobs:</h2>
+
+      {% if posted_jobs_active %}
+        <h3>Jobs you posted: </h3>
+        {% for job in posted_jobs_active %}
+          <div class="job_listing">
+            <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+            <p>Compensation: {{ job.compensation }} €</p>
+            <p>Applications until: {{ job.assign_deadline }}</p>
+            <p>Has to be completed until: {{ job.completion_deadline }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% if assigned_jobs_active %}
+        <h3>Jobs you are assigned to: </h3>
+        {% for job in assigned_jobs_active %}
+          <div class="job_listing">
+            <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+            <p>Compensation: {{ job.compensation }} €</p>
+            <p>Applications until: {{ job.assign_deadline }}</p>
+            <p>Has to be completed until: {{ job.completion_deadline }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endif %}
+
+    {% if posted_jobs_previous or assigned_jobs_previous %}
+      <h2>Your previous jobs:</h2>
+
+      {% if posted_jobs_previous %}
+        <h3>Jobs you posted: </h3>
+        {% for job in posted_jobs_previous %}
+          <div class="job_listing">
+            <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+            <p>Compensation: {{ job.compensation }} €</p>
+            <p>Applications until: {{ job.assign_deadline }}</p>
+            <p>Has to be completed until: {{ job.completion_deadline }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% if assigned_jobs_previous %}
+        <h3>Jobs you are assigned to: </h3>
+        {% for job in assigned_jobs_previous %}
+          <div class="job_listing">
+            <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{ job.name }}</a></h3>
+            <p>Compensation: {{ job.compensation }} €</p>
+            <p>Applications until: {{ job.assign_deadline }}</p>
+            <p>Has to be completed until: {{ job.completion_deadline }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endif %}
+
   {% else %}
     <h2>You are not logged in</h2>
   {% endif %}

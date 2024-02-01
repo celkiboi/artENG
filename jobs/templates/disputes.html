@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 {% for job in jobs %}
-    <div>
+    <div class="job_listing">
         <h3><a href="{% url 'jobs:job_detail' job.job_id %}">{{job.name}}</a></h3>
         <p>Job type: {{job.job_type}}</p>
         <p>Poster: {{job.poster.get_full_name}}</p>

@@ -1,18 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>User information:</h3>
-<p>Username: {{student.user_name}}</p>
-<p>Name: {{student.first_name}} {{student.last_name}}</p>
-<p>Studies: {{user.student_type}}</p>
-<p>Institution: {{student.institution}}</p>
+  <div class="profile-container">
+    <div class="user-information">
+      <h3>User information:</h3>
+      <p>Username: {{student.user_name}}</p>
+      <p>Name: {{student.first_name}} {{student.last_name}}</p>
+      <p>Studies: {{user.student_type}}</p>
+      <p>Institution: {{student.institution}}</p>
+    </div>
 
-<h3>Activity information:</h3>
-<p>Completed jobs: {{completed_jobs}}</p>
-<p>Date joined: {{student.date_joined}}</p>
-<p>Last active: {{student.last_login}}</p>
+    <div class="activity-information">
+      <h3>Activity information:</h3>
+      <p>Completed jobs: {{completed_jobs}}</p>
+      <p>Date joined: {{student.date_joined}}</p>
+      <p>Last active: {{student.last_login}}</p>
+    </div>
 
-<h3>Moderation information:</h3>
-<p>Is a staff member: {{student.is_staff}}</p>
-<p>Is a platform admin: {{student.is_superuser}}</p>
+    <div class="moderation-information">
+      <h3>Moderation information:</h3>
+      <p>Is a staff member: {{student.is_staff}}</p>
+      <p>Is a platform admin: {{student.is_superuser}}</p>
+    </div>
+  </div>
 {% endblock %}

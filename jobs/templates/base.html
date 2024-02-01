@@ -6,53 +6,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}Your Web Application{% endblock %}</title>
-    <!-- You can link your own stylesheet here if needed -->
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
-<nav>
-    <div>
-        <a href="">Your Logo</a>
-
-        <ul>
-            <li>
-                <a href="{% url 'jobs:jobs' %}">Jobs</a>
-            </li>
-            {% if user.is_authenticated %}
-            <li>
-                <a href="{% url 'jobs:create_job' %}">Post a Job</a>
-            </li>
-                {% if user.is_staff %}
+    <nav>
+        <div>
+            <a href="{% url 'jobs:home' %}">
+                <img src="{% static 'artENG.png' %}" alt="Logo" style="height: 60px; width: auto;", id="logo">
+            </a>
+    
+            <ul class="nav-links">
                 <li>
-                    <a href="{% url 'jobs:disputes' %}">Disputes</a>
+                    <a href="{% url 'jobs:jobs' %}">Jobs</a>
                 </li>
+                {% if user.is_authenticated %}
+                <li>
+                    <a href="{% url 'jobs:create_job' %}">Post a Job</a>
+                </li>
+                    {% if user.is_staff %}
+                    <li>
+                        <a href="{% url 'jobs:disputes' %}">Disputes</a>
+                    </li>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </ul>
-
-        <ul>
-            {% if user.is_authenticated %}
-                <li>
-                    <a href="{% url 'jobs:profile' student.user_name %}">Profile</a>
-                </li>
-                <li>
-                    <a href="{% url 'jobs:logout' %}">Logout</a>
-                </li>
-                <li>
-                    <a href="{% url 'jobs:my_jobs' %}">My Jobs</a>
-                </li>
-                <li>
-                    <p>Balance: {{user.balance}}€</p>
-                </li>
-            {% else %}
-                <li>
-                    <a href="{% url 'jobs:login' %}">Login</a>
-                </li>
-            {% endif %}
-        </ul>
-    </div>
-</nav>
+            </ul>
+    
+            <ul class="user-links">
+                {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'jobs:profile' student.user_name %}">Profile</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'jobs:logout' %}">Logout</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'jobs:my_jobs' %}">My Jobs</a>
+                    </li>
+                    <li>
+                        <p>Balance: {{user.balance}}€</p>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'jobs:login' %}">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
 
 <div class="content">
     {% block content %}{% endblock %}

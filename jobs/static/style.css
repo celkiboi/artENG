@@ -1,0 +1,328 @@
+body, h1, h2, h3, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Ariel', sans-serif;
+}
+
+nav {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 20px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav div {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav ul {
+        margin-top: 10px;
+    }
+
+    nav a {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+.job_listing {
+    border-bottom: 2px solid #000000;
+    margin-bottom: 12px;
+}
+
+.job_listing p {
+    margin-bottom: 2px;
+}
+
+
+.create-job-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+.create-job-form {
+    display: flex;
+    flex-direction: column;
+}
+  
+.create-job-form label {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+  
+.create-job-form input,
+.create-job-form textarea {
+    padding: 10px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+  
+.create-job-button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+  
+.create-job-button:hover {
+    background-color: #45a049;
+}
+
+.job-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.job-info {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.job-info h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.job-info p {
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#success_application, #failure_application {
+    margin-top: 20px;
+}
+
+#success_application, #failure_application h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    display: none;
+}
+  
+.login-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.login-container form {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
+.login-container form p {
+    color: #ff0000; 
+    margin-bottom: 10px;
+}
+
+.login-containerform label {
+    display: block;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.login-container form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.login-container form input[type="submit"] {
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.login-container h3 a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.login-container h3 a:hover {
+    text-decoration: underline;
+}
+
+.welcome-section {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.main-section {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.main-section h2 {
+    margin-bottom: 6px;
+}
+
+.feature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.feature {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-right: 10px;
+    background-color: #f9f9f9;
+}
+
+.feature:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.feature h3 {
+    margin-top: 10px;
+    margin-bottom: 7px;
+}
+
+.feature p {
+    margin-bottom: 10px;
+}
+
+.feature-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .feature-section {
+        flex-direction: column;
+    }
+
+    .feature {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    nav {
+        flex-direction: grid;
+        position: relative;
+    }
+
+    .nav-links {
+        margin-top: 10px;
+        display: grid; 
+        grid-template-columns: repeat(1, 1fr);  
+        gap: 10px;  
+        text-align: center;
+        background-color: #333;
+        position: relative;
+        left: 0;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .user-links {
+        margin-top: 10px;
+        display: grid;  
+        grid-template-columns: repeat(1, 1fr);  
+        gap: 10px;  
+        text-align: center;
+        background-color: #333;
+        position: relative;
+        left: 0;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .nav-links li, .user-links li {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    nav a {
+        margin-bottom: 10px;
+    }
+
+    #logo {
+        display: none;
+    }
+}
+
+.profile-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-information,
+  .activity-information,
+  .moderation-information {
+    margin-bottom: 20px;
+  }
