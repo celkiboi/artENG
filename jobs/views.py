@@ -3,10 +3,10 @@ from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect, get_object_or_404
 from .forms import LoginForm, RegistrationForm, JobForm
 from django.shortcuts import render, redirect
-from .models import Student, Job, JobApplication
+from .models import Student, Job, JobApplication, Dispute
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib import messages
 
 class CustomLoginView(LoginView):
@@ -62,6 +62,8 @@ def job_detail(request, job_id):
     user_has_applied = False
     applications = JobApplication.objects.filter(job = job)
     number_of_applications = applications.count
+    dispute = Dispute.objects.filter(job = job).first()
+    is_disputed = dispute is not None
     if not request.user.is_anonymous:
         can_apply = not user_has_applied and student != poster and job.job_type == student.student_type
         user_has_applied = JobApplication.objects.filter(job = job, applicant=student).exists()
@@ -72,7 +74,9 @@ def job_detail(request, job_id):
         'can_apply' : can_apply,
         'number_of_applications': number_of_applications,
         'user_has_applied' : user_has_applied,
-        'applications' : applications
+        'applications' : applications,
+        'is_disputed' : is_disputed,
+        'dispute': dispute
     }
     return render(request, 'job_details.html', context)
 
@@ -153,3 +157,71 @@ def accept_job_application(request, application_id):
     job.assigned_to = application.applicant
     job.save()
     return redirect('jobs:job_detail', job_id=job.job_id)
+
+@require_POST
+def update_dispute_view(request, job_id):
+    job = get_object_or_404(Job, pk=job_id)
+    if not request.user.is_staff:
+        return JsonResponse({'success': False, 'message': 'User is not a staff member.'})
+    chosen_side = request.POST.get("chosen_side")
+    approved_by = request.POST.get("approved_by")
+    dispute, created = Dispute.objects.get_or_create(job=job)
+    if approved_by == "engineering":
+        dispute.eng_approved = True
+    if approved_by == "art":
+        dispute.art_approved = True
+    dispute.chosen_side = chosen_side
+    dispute.save()
+    return JsonResponse({'success': True, 'message': 'Dispute updated successfully.'})
+
+@require_POST
+def finish_dispute_view(request, job_id):
+    job = get_object_or_404(Job, pk=job_id)
+    if not request.user.is_staff:
+        return JsonResponse({'success': False, 'message': 'User is not a staff member.'})
+    dispute = get_object_or_404(Dispute, job=job)
+    if dispute.eng_approved and request.user.student_type == "engineering":
+        return JsonResponse({'success': False, 'message': 'User is an engineer, needs to be an artist.'})
+    if dispute.art_approved and request.user.student_type == "art":
+        return JsonResponse({'success': False, 'message': 'User is an artist, needs to be an engineer.'})
+    
+    answer = request.POST.get("answer")
+    if answer == 'no':
+        dispute.art_approved = False
+        dispute.eng_approved = False
+        dispute.save()
+        return JsonResponse({'success': True, 'message': 'Dispute is not resolved.'})
+    if answer == 'yes':
+        if dispute.chosen_side == "poster":
+            job.assigned_to.balance -= job.compensation
+            job.assigned_to.save()
+            job.poster.balance += job.compensation
+            job.poster.save()
+        job.was_disputed = True
+        job.save()
+        dispute.delete()
+        return JsonResponse({'success': True, 'message': 'Dispute was resolved.'})
+    return JsonResponse({'success': False, 'message': 'Unknown error.'})
+
+
+@login_required
+def dispute_view(request, job_id):
+    if request.method == 'POST':
+        job = get_object_or_404(Job, pk=job_id)
+        Dispute.objects.create(job=job)
+    return JsonResponse({'success': True, 'message': 'Created dispute.'})
+
+@login_required
+def disputes(request):
+    student = request.user
+    if not student.is_staff:
+        return HttpResponseForbidden("Access Forbidden")
+    disputes = Dispute.objects.iterator()
+    jobs = []
+    for dispute in disputes:
+        jobs.append(dispute.job)
+    context = {
+        'jobs': jobs,
+        'student': student
+    }
+    return render(request, 'disputes.html', context)

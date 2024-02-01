@@ -85,9 +85,7 @@ class Job(models.Model):
     compensation = models.DecimalField(max_digits=10, decimal_places=2)
     is_completed = models.BooleanField(default=False)
     finished_link = models.TextField(default="")
-    is_under_dispute = models.BooleanField(default=False)
-    eng_approved = models.BooleanField(default=False)
-    art_approved = models.BooleanField(default=False)
+    was_disputed = models.BooleanField(default=False)
     
     def __str__(self):
         return self.name
@@ -101,3 +99,14 @@ class JobApplication(models.Model):
 
     def __str__(self):
         return f"Application for {self.job.name} by {self.applicant.get_full_name()}"
+
+class Dispute(models.Model):
+    id = models.AutoField(primary_key=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="disputed_job")
+    SIDE_CHOICES = [
+        ('poster', 'Poster'),
+        ('worker', 'Worker')
+    ]
+    chosen_side = models.CharField(max_length=7, choices=SIDE_CHOICES, null=True, default=None)
+    eng_approved = models.BooleanField(default=False)
+    art_approved = models.BooleanField(default=False)

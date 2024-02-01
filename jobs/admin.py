@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import Student, Job, JobApplication
+from .models import Student, Job, JobApplication, Dispute
 
 class StudentAdmin(admin.ModelAdmin):
     TYPE_CHOICES = (
@@ -31,3 +31,8 @@ class JobApplicationAdmin(admin.ModelAdmin):
     list_filter = ('is_accepted',)
     search_fields = ('job__name', 'applicant__user_name', 'applicant__first_name', 'applicant__last_name')
     date_hierarchy = 'applied_at'
+
+@admin.register(Dispute)
+class DisputeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'job', 'chosen_side', 'eng_approved', 'art_approved')
+    search_fields = ('id', 'job', 'chosen_side', 'eng_approved', 'art_approved')

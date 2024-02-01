@@ -23,6 +23,11 @@
             <li>
                 <a href="{% url 'jobs:create_job' %}">Post a Job</a>
             </li>
+                {% if user.is_staff %}
+                <li>
+                    <a href="{% url 'jobs:disputes' %}">Disputes</a>
+                </li>
+                {% endif %}
             {% endif %}
         </ul>
 

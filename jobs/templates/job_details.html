@@ -3,7 +3,7 @@
 {% if request.user.is_anonymous %}
     <h2>You need to be logged in to view jobs</h2>
 {% else %}
-    {% if job.assigned_to == student or job.poster == student %}
+    {% if job.assigned_to == student or job.poster == student or student.is_staff %}
         <h3>Job info:</h3>
         <p>Job name: {{job.name}}</p>
         <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
@@ -15,11 +15,40 @@
         <p>{{job.description}}</p>
         {% if job.assigned_to is not None %}
             {% if job.is_completed %}
-            <h3>
-                This job has been completed by:
-                <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
-            </h3>
-            <p>View the completed job <a href="{{job.finished_link}}">here</a></p>
+                <h3>
+                    This job has been completed by:
+                    <a href="{% url 'jobs:profile' job.assigned_to.user_name %}">{{job.assigned_to.get_full_name}}</a>
+                </h3>
+                <p>View the completed job <a href="{{job.finished_link}}">here</a></p>
+                {% if is_disputed %}
+                    <h3>This job is under dispute</h3>
+                    {% if student.is_staff %}
+                        {% if dispute.eng_approved and student.student_type == "engineering" %}
+                            <h3>You cannot edit this dispute</h3>
+                        {% elif dispute.art_approved and student.student_type == "art" %}
+                            <h3>You cannot edit this dispute</h3>
+                        {% elif dispute.art_approved and student.student_type == "engineering" %}
+                            <h3>Art staff member has sided with {{dispute.chosen_side}}</h3>
+                            <p>Do you agree with the staff member?</p>
+                            <button id="yesDispute">Yes</button>
+                            <button id="noDispute">No</button>
+                        {% elif dispute.eng_approved and student.student_type == "art" %}
+                            <h3>Engineering staff member has sided with {{dispute.chosen_side}}</h3>
+                            <p>Do you agree with the staff member?</p>
+                            <button id="yesDispute">Yes</button>
+                            <button id="noDispute">No</button>
+                        {% elif not dispute.eng_approved and not dispute_art_approved %}
+                            <button id="sidePosterButton">Side with poster</button>
+                            <button id="sideWorkerButton">Side with worker</button>
+                        {% endif %}
+                    {% endif %}
+                {% elif job.poster == student %}
+                    {% if not job.was_disputed %}
+                        <button id="disputeButton">Dispute</button>
+                    {% else %}
+                        <p>The dispute for this job has already been resolved</p>
+                    {% endif %}
+                {% endif %}
             {% else %}
                 <h3>
                     This job has been assigned to 
@@ -28,7 +57,7 @@
                 {% if job.assigned_to == student %}
                     <label for="jobFinishedLink">Enter Finished Job Link:</label>
                     <input type="text" id="jobFinishedLink" name="jobFinishedLink" required>
-                    <button id="finishButton" >Mark job as completed</button>
+                    <button id="finishButton">Mark job as completed</button>
                 {% endif %}
             {% endif %}
         {% elif number_of_applications == 0 %}
@@ -46,7 +75,7 @@
     {% elif job.assigned_to is not None %}
         <h2>Sorry this job is taken!</h2>
     {% else %}
-        <h2>This job is still avalible</h2>
+        <h2>This job is still available</h2>
         <h3>Job info:</h3>
         <p>Job name: {{job.name}}</p>
         <p>Poster: <a href="{% url 'jobs:profile' poster.user_name %}">{{poster.get_full_name}}</a></p>
@@ -69,6 +98,7 @@
         {% endif %}
     {% endif %}
 {% endif %}
+
 
 <script>
     document.getElementById("applyButton").addEventListener("click", function() {
@@ -98,6 +128,26 @@
     });
 </script>
 <script>
+    document.getElementById("disputeButton").addEventListener("click", function() {
+
+        fetch("{% url 'jobs:dispute' job.job_id %}", {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+<script>
     document.getElementById("finishButton").addEventListener("click", function() {
         const jobFinishedLink = document.getElementById("jobFinishedLink").value;
         if (jobFinishedLink.trim() === "") {
@@ -109,9 +159,9 @@
             credentials: 'same-origin',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/x-www-form-urlencoded',  // Use form data
+                'Content-Type': 'application/x-www-form-urlencoded',  
             },
-            body: new URLSearchParams({ jobFinishedLink: jobFinishedLink }),  // Convert data to URLSearchParams
+            body: new URLSearchParams({ jobFinishedLink: jobFinishedLink }),  
         })
         .then(() => {
             location.reload();
@@ -139,6 +189,62 @@
             console.error('Error:', error);
         });
     });
+</script>
+<script>
+    document.getElementById("sidePosterButton").addEventListener("click", function() {
+        updateDispute('poster');
+    });
+
+    document.getElementById("sideWorkerButton").addEventListener("click", function() {
+        updateDispute('worker');
+    });
+
+    function updateDispute(chosenSide) {
+        fetch(`{% url 'jobs:update_dispute' job.job_id %}`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ chosen_side: chosenSide, approved_by: `{{ student.student_type }}`}),
+        })
+        .then(response => response.json())
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+</script>
+<script>
+    document.getElementById("yesDispute").addEventListener("click", function() {
+        finishDispute('yes');
+    });
+
+    document.getElementById("noDispute").addEventListener("click", function() {
+        finishDispute('no');
+    });
+
+    function finishDispute(Answer) {
+        fetch(`{% url 'jobs:finish_dispute' job.job_id %}`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ answer: Answer, approved_by: `{{ student.student_type }}`}),
+        })
+        .then(response => response.json())
+        .then(() => {
+            location.reload();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
 </script>
 
 <div id="success_application" style="display: none;"><h2 id="success_application_text"></h2></div>
