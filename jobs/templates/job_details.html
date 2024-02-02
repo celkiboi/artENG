@@ -67,7 +67,7 @@
             {% elif job.poster == student %}
                 <h3>Applications: </h3>
                 {% for application in applications %}
-                    <div>
+                    <div class="job-application">
                         <p>Applicant: <a href="{% url 'jobs:profile' application.applicant.user_name %}">{{ application.applicant.get_full_name }}</a></p>
                         <p>Applied at: {{ application.applied_at }}</p>
                         <button id="acceptApplicationButton" data-application-id="{{ application.application_id }}">Accept</button>
